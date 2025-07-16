@@ -19,6 +19,8 @@ import torch.nn.functional as F
 import torch.autograd as autograd
 import torch
 
+DATA_DIR = "C:\Users\13463\OneDrive - University Of Houston\fourier\WGAN for Image Denoising\BSDS300\images\train"
+
 os.makedirs("images", exist_ok=True)
 
 parser = argparse.ArgumentParser()
