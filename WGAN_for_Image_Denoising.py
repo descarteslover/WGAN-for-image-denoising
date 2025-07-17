@@ -29,7 +29,7 @@ transform = transforms.Compose([transforms.ToTensor()])
 dataset = datasets.ImageFolder(DATA_DIR, transform=transform)
 sample_img, _ = dataset[0]
 channels, height, width = sample_img.shape
-img_shape = (channels, height, width)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
@@ -40,6 +40,8 @@ parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of firs
 parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
 parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
 #parser.add_argument("--img_size", type=int, default=28, help="size of each image dimension")
+parser.add_argument("--height", type=int, default=height, help="height dimension of each image")
+parser.add_argument("--width", type=int, default=width, help="width dimension of each image")
 parser.add_argument("--channels", type=int, default=1, help="number of image channels")
 parser.add_argument("--n_critic", type=int, default=5, help="number of training steps for discriminator per iter")
 parser.add_argument("--clip_value", type=float, default=0.01, help="lower and upper clip value for disc. weights")
@@ -47,7 +49,9 @@ parser.add_argument("--sample_interval", type=int, default=400, help="interval b
 opt = parser.parse_args()
 print(opt)
 
-img_shape = (opt.channels, opt.img_size, opt.img_size)
+#img_shape = (opt.channels, opt.img_size, opt.img_size)
+img_shape = (opt.channels, height, width)
+#opt.img_size = max(height, width)
 
 cuda = True if torch.cuda.is_available() else False
 
@@ -95,7 +99,12 @@ class Discriminator(nn.Module):
         return validity
 
 class NoisyDataset(Dataset):
-    def __init__(self, root_dir, img_size)
+    def __init__(self, root_dir, img_size=opt.img_size, noise_type = "Gaussian"):
+        self.root_dir = root_dir
+        self.image_files = [f for f in os.listdir(root_dir) if f.endswith(('.jpg','.png','.jpeg'))]
+        self.transform = transforms.Compose([
+            transforms.Resize])
+
 k = 2
 p = 6
 
@@ -109,19 +118,19 @@ if cuda:
     discriminator.cuda()
 
 # Configure data loader
-os.makedirs("../../data/mnist", exist_ok=True)
-dataloader = torch.utils.data.DataLoader(
-    datasets.MNIST(
-        "../../data/mnist",
-        train=True,
-        download=True,
-        transform=transforms.Compose(
-            [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
-        ),
-    ),
-    batch_size=opt.batch_size,
-    shuffle=True,
-)
+#os.makedirs("../../data/mnist", exist_ok=True)
+#dataloader = torch.utils.data.DataLoader(
+#    datasets.MNIST(
+#        "../../data/mnist",
+#        train=True,
+#        download=True,
+#        transform=transforms.Compose(
+#            [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
+#        ),
+#    ),
+#    batch_size=opt.batch_size,
+#    shuffle=True,
+#)
 
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
