@@ -21,7 +21,15 @@ import torch
 
 DATA_DIR = "C:\Users\13463\OneDrive - University Of Houston\fourier\WGAN for Image Denoising\BSDS300\images\train"
 
-os.makedirs("images", exist_ok=True)
+#os.makedirs("images", exist_ok=True)
+#Prepare transform
+transform = transforms.Compose([transforms.ToTensor()])
+
+#Load sample image to infer shape
+dataset = datasets.ImageFolder(DATA_DIR, transform=transform)
+sample_img, _ = dataset[0]
+channels, height, width = sample_img.shape
+img_shape = (channels, height, width)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
