@@ -7,7 +7,7 @@ import sys
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
 
-#from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from PIL import Image
 import torchvision.transforms as transforms
@@ -155,6 +155,11 @@ if cuda:
 #    shuffle=True,
 #)
 
+dataloader = DataLoader(
+    NoisyDataset(DATA_DIR, height=opt.height, width=opt.width),
+    batch_size=opt.batch_size,
+    shuffle=True
+    )
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
