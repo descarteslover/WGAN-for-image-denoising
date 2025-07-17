@@ -99,16 +99,32 @@ class Discriminator(nn.Module):
         return validity
 
 class NoisyDataset(Dataset):
-    def __init__(self, root_dir, img_size=opt.img_size, noise_type="Gaussian"):
+    def __init__(self, root_dir, height=opt.height, width=opt.width, noise_type="Gaussian"):
         self.root_dir = root_dir
         self.image_files = [f for f in os.listdir(root_dir) if f.endswith(('.jpg','.png','.jpeg'))]
         self.transform = transforms.Compose([
-            transforms.Resize((opt.height, opt.height)),
+            transforms.Resize((height, width)),
             transforms.ToTensor(),
             transforms.Normalize([0.5], [0.5])
             ])
         if noise_type == "Gaussian":
             self.noise_factor = 0.5
+
+        def __len__(self):
+            return len(self.image_files)
+
+        def __getitem__(self, idx):
+            img_path = os.path.join(self.root_dir, self.image_files[idx])
+            image = Image.open(img_path).convert('L')
+            image = self.transform(image)
+
+            if self.noise_type == "Gaussian":
+                noisy_image = image + self.noise_factor * torch.randn_like(image)
+                noisy_image = torch.clamp(noisy_image, -1, 1) #Different numeric arguments possible
+
+            # ADD other noise types here
+
+            return noisy_image, image # (noisy, original)
 
 
 
