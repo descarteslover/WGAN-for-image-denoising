@@ -50,7 +50,7 @@ opt = parser.parse_args()
 print(opt)
 
 #img_shape = (opt.channels, opt.img_size, opt.img_size)
-img_shape = (opt.channels, height, width)
+img_shape = (opt.channels, opt.height, opt.width)
 #opt.img_size = max(height, width)
 
 cuda = True if torch.cuda.is_available() else False
@@ -99,11 +99,18 @@ class Discriminator(nn.Module):
         return validity
 
 class NoisyDataset(Dataset):
-    def __init__(self, root_dir, img_size=opt.img_size, noise_type = "Gaussian"):
+    def __init__(self, root_dir, img_size=opt.img_size, noise_type="Gaussian"):
         self.root_dir = root_dir
         self.image_files = [f for f in os.listdir(root_dir) if f.endswith(('.jpg','.png','.jpeg'))]
         self.transform = transforms.Compose([
-            transforms.Resize])
+            transforms.Resize((opt.height, opt.height)),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5], [0.5])
+            ])
+        if noise_type == "Gaussian":
+            self.noise_factor = 0.5
+
+
 
 k = 2
 p = 6
