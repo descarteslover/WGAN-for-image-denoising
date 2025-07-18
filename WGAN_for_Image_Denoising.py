@@ -123,7 +123,6 @@ class NoisyDataset(Dataset):
                 noisy_image = torch.clamp(noisy_image, -1, 1) #Different numeric arguments possible
 
             # ADD other noise types here
-
             return noisy_image, image # (noisy, original)
 
 
